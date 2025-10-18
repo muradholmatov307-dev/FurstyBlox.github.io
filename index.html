@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Scripts Hub - Лучшие скрипты для Роблокс</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #00a8ff;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00a8ff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #00a8ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            background: linear-gradient(45deg, rgba(0, 168, 255, 0.1), rgba(255, 0, 150, 0.1));
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00a8ff, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #b0b0b0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #00a8ff, #0097e6);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 168, 255, 0.3);
+        }
+
+        /* Scripts Section */
+        .scripts-section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #00a8ff;
+        }
+
+        .scripts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .script-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .script-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .script-title {
+            font-size: 1.3rem;
+            color: #00a8ff;
+        }
+
+        .script-category {
+            background: #9c27b0;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .script-description {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        .script-code {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .script-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-copy {
+            background: #00a8ff;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-copy:hover {
+            background: #0097e6;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #45a049;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00a8ff;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #00a8ff, #0097e6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 168, 255, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #00a8ff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .scripts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">RobloxScripts</a>
+                <ul class="nav-links">
+                    <li><a href="#scripts">Скрипты</a></li>
+                    <li><a href="#upload">Добавить скрипт</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Лучшие скрипты для Roblox</h1>
+            <p>Находите, делитесь и используйте мощные скрипты для ваших игр в Roblox</p>
+            <a href="#scripts" class="cta-button">Смотреть скрипты</a>
+        </div>
+    </section>
+
+    <!-- Scripts Section -->
+    <section id="scripts" class="scripts-section">
+        <div class="container">
+            <h2 class="section-title">Популярные скрипты</h2>
+            <div class="scripts-grid">
+                <!-- Script 1 -->
+                <div class="script-card">
+                    <div class="script-header">
+                        <h3 class="script-title">Авто-ферма</h3>
+                        <span class="script-category">Фарминг</span>
+                    </div>
+                    <p class="script-description">Автоматическая ферма для популярных игр. Собирает ресурсы без вашего участия.</p>
+                    <div class="script-code">
+-- Авто-ферма скрипт
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+while true do
+    wait(1)
+    -- Код автоматического фарминга
+    for _, crop in ipairs(workspace.Crops:GetChildren()) do
+        if crop:FindFirstChild("Ready") then
+            -- Сбор урожая
+        end
+    end
+end
+                    </div>
+                    <div class="script-actions">
+                        <button class="btn btn-copy" onclick="copyCode(this)">Копировать код</button>
+                        <button class="btn btn-download">Скачать</button>
+                    </div>
+                </div>
+
+                <!-- Script 2 -->
+                <div class="script-card">
+                    <div class="script-header">
+                        <h3 class="script-title">ESP Hack</h3>
+                        <span class="script-category">Визуал</span>
+                    </div>
+                    <p class="script-description">Отображает игроков и предметы через стены. Полезно для PVP игр.</p>
+                    <div class="script-code">
+-- ESP скрипт
+local esp = {}
+function esp:AddESP(object, color)
+    local highlight = Instance.new("Highlight")
+    highlight.Parent = object
+    highlight.FillColor = color
+end
+
+-- Применение к игрокам
+for _, player in ipairs(game.Players:GetPlayers()) do
+    if player.Character then
+        esp:AddESP(player.Character, Color3.new(1, 0, 0))
+    end
+end
+                    </div>
+                    <div class="script-actions">
+                        <button class="btn btn-copy" onclick="copyCode(this)">Копировать код</button>
+                        <button class="btn btn-download">Скачать</button>
+                    </div>
+                </div>
+
+                <!-- Script 3 -->
+                <div class="script-card">
+                    <div class="script-header">
+                        <h3 class="script-title">Спидхак</h3>
+                        <span class="script-category">Движение</span>
+                    </div>
+                    <p class="script-description">Увеличивает скорость передвижения вашего персонажа.</p>
+                    <div class="script-code">
+-- Спидхак скрипт
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Установка скорости
+humanoid.WalkSpeed = 50 -- Стандартная скорость 16
+
+-- Горячие клавиши
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        humanoid.WalkSpeed = 100
+    end
+end)
+                    </div>
+                    <div class="script-actions">
+                        <button class="btn btn-copy" onclick="copyCode(this)">Копировать код</button>
+                        <button class="btn btn-download">Скачать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="upload-section">
+        <div class="container">
+            <h2 class="section-title">Добавить свой скрипт</h2>
+            <form class="upload-form" onsubmit="submitScript(event)">
+                <div class="form-group">
+                    <label for="scriptName">Название скрипта</label>
+                    <input type="text" id="scriptName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="scriptCategory">Категория</label>
+                    <select id="scriptCategory" class="form-control" required>
+                        <option value="">Выберите категорию</option>
+                        <option value="farming">Фарминг</option>
+                        <option value="visual">Визуал</option>
+                        <option value="movement">Движение</option>
+                        <option value="combat">Бой</option>
+                        <option value="utility">Утилиты</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="scriptDescription">Описание</label>
+                    <textarea id="scriptDescription" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="scriptCode">Код скрипта</label>
+                    <textarea id="scriptCode" class="form-control" required placeholder="Вставьте ваш Lua код здесь..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Опубликовать скрипт</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    <p>&copy; 2024 RobloxScripts Hub. Все права защищены.</p>
+                </div>
+                <ul class="footer-links">
+                    <li><a href="#">Правила использования</a></li>
+                    <li><a href="#">Конфиденциальность</a></li>
+                    <li><a href="#">Дискорд</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Функция копирования кода
+        function copyCode(button) {
+            const codeBlock = button.closest('.script-card').querySelector('.script-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeBlock.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Визуальная обратная связь
+            const originalText = button.textContent;
+            button.textContent = 'Скопировано!';
+            button.style.background = '#4caf50';
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // Функция отправки формы
+        function submitScript(event) {
+            event.preventDefault();
+            
+            const scriptName = document.getElementById('scriptName').value;
+            const scriptCategory = document.getElementById('scriptCategory').value;
+            const scriptCode = document.getElementById('scriptCode').value;
+            
+            // Здесь можно добавить отправку данных на сервер
+            alert(`Скрипт "${scriptName}" успешно отправлен на модерацию!`);
+            
+            // Очистка формы
+            event.target.reset();
+        }
+
+        // Плавная прокрутка для навигации
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
