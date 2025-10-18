@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Scripts Hub - Лучшие скрипты для Роблокс</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -393,7 +394,7 @@
 
         .modal-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
@@ -455,6 +456,20 @@
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Verification Badge */
+        .verification-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .verification-pending {
+            background: var(--warning);
         }
 
         /* Upload Section */
@@ -609,15 +624,8 @@
                     <li><a href="#top"><i class="fas fa-trophy"></i> Топ</a></li>
                     <li><a href="#docs"><i class="fas fa-book"></i> Документация</a></li>
                 </ul>
-                <div class="user-section">
-                    <div class="auth-buttons">
-                        <button class="btn btn-secondary" onclick="showAuthModal('login')">
-                            <i class="fas fa-sign-in-alt"></i> Войти
-                        </button>
-                        <button class="btn cta-button" onclick="showAuthModal('register')">
-                            <i class="fas fa-user-plus"></i> Регистрация
-                        </button>
-                    </div>
+                <div class="user-section" id="userSection">
+                    <!-- Динамически обновляется -->
                 </div>
             </nav>
         </div>
@@ -634,6 +642,7 @@
                 <button class="close-modal" onclick="closeAuthModal()">&times;</button>
             </div>
             
+            <!-- Форма входа -->
             <form id="loginForm" class="auth-form active">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
@@ -651,6 +660,7 @@
                 </div>
             </form>
 
+            <!-- Форма регистрации -->
             <form id="registerForm" class="auth-form">
                 <div class="form-group">
                     <label for="registerUsername">Имя пользователя</label>
@@ -662,12 +672,30 @@
                 </div>
                 <div class="form-group">
                     <label for="registerPassword">Пароль</label>
-                    <input type="password" id="registerPassword" class="form-control" required>
+                    <input type="password" id="registerPassword" class="form-control" required minlength="6">
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">Создать аккаунт</button>
                     <button type="button" class="btn btn-secondary" onclick="switchAuthForm('login')">
                         Уже есть аккаунт
+                    </button>
+                </div>
+            </form>
+
+            <!-- Форма подтверждения email -->
+            <form id="verifyEmailForm" class="auth-form">
+                <div class="form-group">
+                    <h3 style="color: var(--primary); text-align: center;">Подтверждение Email</h3>
+                    <p style="text-align: center; color: var(--light); margin-bottom: 1rem;">
+                        Мы отправили код подтверждения на ваш email. Введите его ниже:
+                    </p>
+                    <label for="verificationCode">Код подтверждения</label>
+                    <input type="text" id="verificationCode" class="form-control" required maxlength="6" placeholder="123456">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Подтвердить</button>
+                    <button type="button" class="btn btn-secondary" onclick="resendVerificationCode()">
+                        Отправить код повторно
                     </button>
                 </div>
             </form>
@@ -802,13 +830,23 @@
     </footer>
 
     <script>
-        // Database simulation
+        // ✅ Инициализация EmailJS с вашими НОВЫМИ ключами
+        emailjs.init("EERd_QdM2N-IIHWJ8");
+
+        // ✅ Конфигурация EmailJS с вашими НОВЫМИ ключами
+        const EMAILJS_CONFIG = {
+            serviceId: "service_wt7nk7a",
+            templateId: "template_hbrwklb"
+        };
+
+        // База данных в LocalStorage
         let scriptsDB = JSON.parse(localStorage.getItem('scriptsDB')) || [];
         let usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let verificationCodes = JSON.parse(localStorage.getItem('verificationCodes')) || {};
         let scriptIdCounter = parseInt(localStorage.getItem('scriptIdCounter')) || 1;
 
-        // Initialize with sample data if empty
+        // Инициализация демо-данных
         if (scriptsDB.length === 0) {
             scriptsDB = [
                 {
@@ -824,7 +862,6 @@ while true do
     wait(1)
     for _, crop in ipairs(workspace.Crops:GetChildren()) do
         if crop:FindFirstChild("Ready") then
-            -- Сбор урожая
             firetouchinterest(player.Character.HumanoidRootPart, crop, 0)
             wait(0.1)
             firetouchinterest(player.Character.HumanoidRootPart, crop, 1)
@@ -888,11 +925,12 @@ end)`,
             saveToLocalStorage();
         }
 
-        // Utility Functions
+        // Утилиты
         function saveToLocalStorage() {
             localStorage.setItem('scriptsDB', JSON.stringify(scriptsDB));
             localStorage.setItem('usersDB', JSON.stringify(usersDB));
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('verificationCodes', JSON.stringify(verificationCodes));
             localStorage.setItem('scriptIdCounter', scriptIdCounter.toString());
         }
 
@@ -906,7 +944,41 @@ end)`,
             }, 3000);
         }
 
-        // Auth Functions
+        function generateVerificationCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // Функции отправки email с новым красивым шаблоном
+        async function sendVerificationEmail(email, code) {
+            try {
+                const templateParams = {
+                    to_email: email,
+                    verification_code: code,
+                    site_name: "RobloxScripts Hub",
+                    current_year: new Date().getFullYear()
+                };
+
+                console.log('Отправка письма на:', email);
+                console.log('Параметры шаблона:', templateParams);
+
+                const result = await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams
+                );
+
+                console.log('Письмо успешно отправлено:', result);
+                return true;
+            } catch (error) {
+                console.error('Ошибка отправки письма:', error);
+                
+                // Fallback: показываем код в уведомлении (для тестирования)
+                showNotification(`Код подтверждения: ${code} (Ошибка email: ${error.text || error.message})`, 'info');
+                return false;
+            }
+        }
+
+        // Функции аутентификации
         function showAuthModal(type) {
             const modal = document.getElementById('authModal');
             modal.style.display = 'block';
@@ -921,53 +993,139 @@ end)`,
         function switchAuthForm(type) {
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
+            const verifyForm = document.getElementById('verifyEmailForm');
             const modalTitle = document.getElementById('authModalTitle');
             
+            loginForm.classList.remove('active');
+            registerForm.classList.remove('active');
+            verifyForm.classList.remove('active');
+
             if (type === 'login') {
                 loginForm.classList.add('active');
-                registerForm.classList.remove('active');
                 modalTitle.textContent = 'Вход в аккаунт';
-            } else {
+            } else if (type === 'register') {
                 registerForm.classList.add('active');
-                loginForm.classList.remove('active');
                 modalTitle.textContent = 'Создание аккаунта';
+            } else if (type === 'verify') {
+                verifyForm.classList.add('active');
+                modalTitle.textContent = 'Подтверждение Email';
             }
         }
 
-        function registerUser(event) {
+        async function registerUser(event) {
             event.preventDefault();
+            
             const username = document.getElementById('registerUsername').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
+            // Проверка существующего пользователя
             if (usersDB.find(user => user.email === email)) {
                 showNotification('Пользователь с таким email уже существует!', 'error');
                 return;
             }
 
-            const newUser = {
+            // Генерация кода подтверждения
+            const verificationCode = generateVerificationCode();
+            
+            // Сохранение кода подтверждения
+            verificationCodes[email] = {
+                code: verificationCode,
+                expires: Date.now() + 3600000, // 1 час
+                userData: { username, email, password }
+            };
+            saveToLocalStorage();
+
+            // Отправка email
+            showNotification('Отправка кода подтверждения...', 'info');
+            const emailSent = await sendVerificationEmail(email, verificationCode);
+
+            if (emailSent) {
+                showNotification('Код подтверждения отправлен на ваш email!', 'success');
+                switchAuthForm('verify');
+            } else {
+                showNotification('Ошибка отправки email, но вы можете использовать код выше', 'warning');
+                switchAuthForm('verify');
+            }
+        }
+
+        function verifyEmail(event) {
+            event.preventDefault();
+            
+            const code = document.getElementById('verificationCode').value;
+            const email = document.getElementById('registerEmail').value;
+            const storedCode = verificationCodes[email];
+
+            if (!storedCode) {
+                showNotification('Сессия истекла. Пройдите регистрацию заново.', 'error');
+                switchAuthForm('register');
+                return;
+            }
+
+            if (storedCode.expires < Date.now()) {
+                delete verificationCodes[email];
+                saveToLocalStorage();
+                showNotification('Срок действия кода истек.', 'error');
+                switchAuthForm('register');
+                return;
+            }
+
+            if (storedCode.code !== code) {
+                showNotification('Неверный код подтверждения.', 'error');
+                return;
+            }
+
+            // Создание пользователя
+            const user = {
                 id: Date.now(),
-                username,
-                email,
-                password, // В реальном приложении пароль должен быть хеширован!
+                username: storedCode.userData.username,
+                email: storedCode.userData.email,
+                password: storedCode.userData.password,
+                isVerified: true,
                 createdAt: new Date().toISOString()
             };
 
-            usersDB.push(newUser);
-            currentUser = newUser;
-            saveToLocalStorage();
+            usersDB.push(user);
+            currentUser = user;
             
-            showNotification('Аккаунт успешно создан!', 'success');
+            // Очистка временных данных
+            delete verificationCodes[email];
+            saveToLocalStorage();
+
+            showNotification('Email успешно подтвержден! Добро пожаловать!', 'success');
             closeAuthModal();
             updateUI();
         }
 
+        function resendVerificationCode() {
+            const email = document.getElementById('registerEmail').value;
+            const storedData = verificationCodes[email];
+            
+            if (!storedData) {
+                showNotification('Сессия истекла', 'error');
+                return;
+            }
+
+            // Генерация нового кода
+            const newCode = generateVerificationCode();
+            storedData.code = newCode;
+            storedData.expires = Date.now() + 3600000;
+            verificationCodes[email] = storedData;
+            saveToLocalStorage();
+
+            // Отправка нового кода
+            sendVerificationEmail(email, newCode);
+            showNotification('Новый код отправлен на ваш email!', 'success');
+        }
+
         function loginUser(event) {
             event.preventDefault();
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
             const user = usersDB.find(u => u.email === email && u.password === password);
+            
             if (user) {
                 currentUser = user;
                 saveToLocalStorage();
@@ -986,7 +1144,7 @@ end)`,
             updateUI();
         }
 
-        // Script Functions
+        // Функции для скриптов
         function submitScript(event) {
             event.preventDefault();
             
@@ -1057,7 +1215,6 @@ end)`,
         }
 
         function filterScripts(category) {
-            // Update active filter button
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
@@ -1106,9 +1263,7 @@ end)`,
                         <button class="btn btn-copy" onclick="copyCode(this, \`${escapeHtml(script.code)}\`)">
                             <i class="fas fa-copy"></i> Копировать
                         </button>
-                        <button class="btn btn-like ${currentUser ? '' : 'disabled'}" 
-                                onclick="likeScript(${script.id})"
-                                ${!currentUser ? 'disabled' : ''}>
+                        <button class="btn btn-like" onclick="likeScript(${script.id})">
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
@@ -1145,15 +1300,19 @@ end)`,
             document.getElementById('totalScripts').textContent = scriptsDB.length;
             document.getElementById('totalUsers').textContent = usersDB.length;
             document.getElementById('totalDownloads').textContent = scriptsDB.reduce((sum, script) => sum + script.downloads, 0);
-            document.getElementById('activeToday').textContent = Math.floor(scriptsDB.length * 0.3); // Simulated active users
+            document.getElementById('activeToday').textContent = Math.floor(scriptsDB.length * 0.3);
         }
 
         function updateUI() {
-            const userSection = document.querySelector('.user-section');
+            const userSection = document.getElementById('userSection');
             if (currentUser) {
+                const verificationStatus = currentUser.isVerified 
+                    ? '<span class="verification-badge">✓ Подтвержден</span>'
+                    : '<span class="verification-badge verification-pending">✗ Не подтвержден</span>';
+
                 userSection.innerHTML = `
                     <div class="user-info">
-                        <span>Привет, ${currentUser.username}!</span>
+                        <span>${currentUser.username} ${verificationStatus}</span>
                     </div>
                     <button class="btn btn-secondary" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i> Выйти
@@ -1173,11 +1332,12 @@ end)`,
             }
         }
 
-        // Event Listeners
+        // Обработчики событий
         document.getElementById('loginForm').addEventListener('submit', loginUser);
         document.getElementById('registerForm').addEventListener('submit', registerUser);
+        document.getElementById('verifyEmailForm').addEventListener('submit', verifyEmail);
 
-        // Close modal when clicking outside
+        // Закрытие модального окна при клике вне его
         window.onclick = function(event) {
             const modal = document.getElementById('authModal');
             if (event.target === modal) {
@@ -1185,14 +1345,14 @@ end)`,
             }
         }
 
-        // Search on Enter key
+        // Поиск по Enter
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchScripts();
             }
         });
 
-        // Initialize
+        // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             loadScripts();
             updateStats();
