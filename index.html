@@ -830,10 +830,10 @@
     </footer>
 
     <script>
-        // ✅ Инициализация EmailJS с вашими НОВЫМИ ключами
+        // ✅ Инициализация EmailJS с вашими ключами
         emailjs.init("EERd_QdM2N-IIHWJ8");
 
-        // ✅ Конфигурация EmailJS с вашими НОВЫМИ ключами
+        // ✅ Конфигурация EmailJS с вашими ключами
         const EMAILJS_CONFIG = {
             serviceId: "service_wt7nk7a",
             templateId: "template_hbrwklb"
@@ -845,6 +845,9 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
         let verificationCodes = JSON.parse(localStorage.getItem('verificationCodes')) || {};
         let scriptIdCounter = parseInt(localStorage.getItem('scriptIdCounter')) || 1;
+
+        // URL для загрузки скриптов из интернета (ЗАМЕНИТЕ НА СВОЙ)
+        const SCRIPTS_URL = 'https://raw.githubusercontent.com/muradholmatov307-dev/FurstyBlox.github.io/refs/heads/main/scripts.json';
 
         // Инициализация демо-данных
         if (scriptsDB.length === 0) {
@@ -925,6 +928,41 @@ end)`,
             saveToLocalStorage();
         }
 
+        // 🔄 Функция для загрузки скриптов из интернета
+        async function loadScriptsFromInternet() {
+            try {
+                showNotification('Загрузка скриптов из интернета...', 'info');
+                
+                const response = await fetch(SCRIPTS_URL + '?t=' + Date.now());
+                if (!response.ok) throw new Error('Не удалось загрузить');
+                
+                const remoteData = await response.json();
+                const remoteScripts = remoteData.scripts || [];
+                
+                // Объединяем локальные и удаленные скрипты
+                let newScriptsAdded = 0;
+                remoteScripts.forEach(remoteScript => {
+                    if (!scriptsDB.find(s => s.id === remoteScript.id)) {
+                        scriptsDB.push(remoteScript);
+                        newScriptsAdded++;
+                    }
+                });
+                
+                saveToLocalStorage();
+                loadScripts();
+                updateStats();
+                
+                if (newScriptsAdded > 0) {
+                    showNotification(`Загружено ${newScriptsAdded} новых скриптов из интернета!`, 'success');
+                } else {
+                    showNotification('Новых скриптов не найдено', 'info');
+                }
+            } catch (error) {
+                console.log('Не удалось загрузить скрипты из интернета:', error);
+                showNotification('Не удалось загрузить скрипты из интернета', 'error');
+            }
+        }
+
         // Утилиты
         function saveToLocalStorage() {
             localStorage.setItem('scriptsDB', JSON.stringify(scriptsDB));
@@ -948,7 +986,7 @@ end)`,
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        // Функции отправки email с новым красивым шаблоном
+        // Функции отправки email
         async function sendVerificationEmail(email, code) {
             try {
                 const templateParams = {
@@ -959,7 +997,6 @@ end)`,
                 };
 
                 console.log('Отправка письма на:', email);
-                console.log('Параметры шаблона:', templateParams);
 
                 const result = await emailjs.send(
                     EMAILJS_CONFIG.serviceId,
@@ -972,7 +1009,7 @@ end)`,
             } catch (error) {
                 console.error('Ошибка отправки письма:', error);
                 
-                // Fallback: показываем код в уведомлении (для тестирования)
+                // Fallback: показываем код в уведомлении
                 showNotification(`Код подтверждения: ${code} (Ошибка email: ${error.text || error.message})`, 'info');
                 return false;
             }
@@ -1169,7 +1206,8 @@ end)`,
             scriptsDB.push(scriptData);
             saveToLocalStorage();
             
-            showNotification('Скрипт успешно опубликован!', 'success');
+            showNotification('Скрипт опубликован! Чтобы другие пользователи увидели ваш скрипт, они должны нажать кнопку "Загрузить из интернета"', 'success');
+            
             event.target.reset();
             loadScripts();
             updateStats();
@@ -1314,6 +1352,9 @@ end)`,
                     <div class="user-info">
                         <span>${currentUser.username} ${verificationStatus}</span>
                     </div>
+                    <button class="btn btn-secondary" onclick="loadScriptsFromInternet()" title="Загрузить скрипты из интернета">
+                        <i class="fas fa-download"></i> Загрузить
+                    </button>
                     <button class="btn btn-secondary" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i> Выйти
                     </button>
@@ -1357,6 +1398,8 @@ end)`,
             loadScripts();
             updateStats();
             updateUI();
+            // Автоматически загружаем скрипты из интернета при запуске
+            loadScriptsFromInternet();
         });
     </script>
 </body>
